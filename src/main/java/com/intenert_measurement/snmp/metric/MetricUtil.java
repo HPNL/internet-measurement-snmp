@@ -1,4 +1,4 @@
-package com.intenert_measurement.snmp;
+package com.intenert_measurement.snmp.metric;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MetricUtil {
 
-    public static List<Metric> computeAggregation(List<Metric> rawValues, Function<Metric, Number> valueFunc, DownSampleAggregation aggregation) {
+    public static List<Metric> computeAggregation(List<Metric> rawValues, Function<Metric, Number> valueFunc, Aggregator aggregation) {
         List<Metric> aggregatedValues = new ArrayList<>();
 
         for (int i = 0; i < rawValues.size(); i++) {

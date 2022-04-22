@@ -1,4 +1,4 @@
-package com.intenert_measurement.snmp;
+package com.intenert_measurement.snmp.metric;
 
 public enum MetricType {
 

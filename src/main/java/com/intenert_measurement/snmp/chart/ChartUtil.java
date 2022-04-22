@@ -1,5 +1,10 @@
-package com.intenert_measurement.snmp;
+package com.intenert_measurement.snmp.chart;
 
+import com.intenert_measurement.snmp.metric.Aggregator;
+import com.intenert_measurement.snmp.metric.Metric;
+import com.intenert_measurement.snmp.metric.MetricType;
+import com.intenert_measurement.snmp.metric.MetricUtil;
+import com.intenert_measurement.snmp.util.HostSnmpConnectionInfo;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.knowm.xchart.BitmapEncoder;
@@ -54,7 +59,7 @@ public class ChartUtil {
                                 MetricUtil.computeAggregation(
                                         metricsEntry.getValue(),
                                         (x -> x.getType() == MetricType.UPTIME ? x.getAvailability() : x.getValue()),
-                                        DownSampleAggregation.AVERAGE
+                                        Aggregator.AVERAGE
                                 ).stream().map(Metric::getValue).collect(Collectors.toList())
                         )
                 );

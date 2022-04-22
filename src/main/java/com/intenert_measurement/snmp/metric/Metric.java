@@ -1,5 +1,6 @@
-package com.intenert_measurement.snmp;
+package com.intenert_measurement.snmp.metric;
 
+import com.intenert_measurement.snmp.util.HostSnmpConnectionInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
