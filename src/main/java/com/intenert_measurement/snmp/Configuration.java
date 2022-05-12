@@ -19,6 +19,9 @@ public class Configuration {
     public static final String IP_ADDR_TABLE_IP = "1.3.6.1.2.1.4.20.1.1";
     public static final String IP_ADDR_TABLE_INDEX = "1.3.6.1.2.1.4.20.1.2";
     public static final String IF_IN_OCTETS = "1.3.6.1.2.1.2.2.1.10";
-    public static final String IF_IN_UCAST_PKTS = "1.3.6.1.2.1.2.2.1.12";
+    public static final String IF_IN_UCAST_PKTS = "1.3.6.1.2.1.2.2.1.11";
     public static final String IF_IN_NUCAST_PKTS = "1.3.6.1.2.1.2.2.1.12";
+    public static final String IF_OUT_OCTETS = "1.3.6.1.2.1.2.2.1.16";
+    public static final String IF_OUT_UCAST_PKTS = "1.3.6.1.2.1.2.2.1.17";
+    public static final String IF_OUT_NUCAST_PKTS = "1.3.6.1.2.1.2.2.1.18";
 }

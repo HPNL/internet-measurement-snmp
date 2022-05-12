@@ -29,7 +29,7 @@ public class CollectorUtil {
             target.setCommunity(new OctetString(host.getRCommunity()));
             target.setVersion(Configuration.SNMP_VERSION);
             target.setAddress(new UdpAddress(host.getIp() + "/" + host.getPort()));
-            target.setRetries(1);
+            target.setRetries(2);
             target.setTimeout(host.getTimeout());
 
             // Create the PDU object

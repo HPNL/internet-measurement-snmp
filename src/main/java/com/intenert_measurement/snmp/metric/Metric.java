@@ -12,12 +12,14 @@ import java.util.Date;
 @Setter
 public class Metric {
 
+    private String oid;
     private Object value;
     private MetricType type;
     private Date timestamp;
     private HostSnmpConnectionInfo host;
 
-    public Metric(Long value, MetricType type, HostSnmpConnectionInfo host) {
+    public Metric(String oid, Object value, MetricType type, HostSnmpConnectionInfo host) {
+        this.oid = oid;
         this.value = value;
         this.host = host;
         this.type = type;
@@ -29,7 +31,7 @@ public class Metric {
     }
 
     public Metric clone() {
-        return new Metric(this.value, this.type, this.timestamp, this.host);
+        return new Metric(this.oid, this.value, this.type, this.timestamp, this.host);
     }
 }
 

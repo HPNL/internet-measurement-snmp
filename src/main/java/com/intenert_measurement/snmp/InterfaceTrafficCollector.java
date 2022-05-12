@@ -22,14 +22,24 @@ public class InterfaceTrafficCollector {
         SnmpCollector snmpCollector = SnmpCollector.ofTable(Arrays.asList(Configuration.IP_ADDR_TABLE_IP, Configuration.IP_ADDR_TABLE_INDEX));
         Map<String, Object> metrics = snmpCollector.collectTable(hosts);
 
+        // find host if index
         for (HostSnmpConnectionInfo host : hosts) {
             String hostIp = metrics.get(Configuration.IP_ADDR_TABLE_IP + "." + host.getIp()).toString();
             Integer hostIfIndex = ((Integer32) metrics.get(Configuration.IP_ADDR_TABLE_INDEX + "." + host.getIp())).getValue();
             hostIndices.put(hostIfIndex, host);
         }
 
+        // read if table values
         for (Map.Entry<Integer, HostSnmpConnectionInfo> entry : hostIndices.entrySet()) {
-            snmpCollector = new SnmpCollector(Collections.singletonList(Configuration.IF_IN_OCTETS + "." + entry.getKey()));
+            snmpCollector = new SnmpCollector(Arrays.asList(
+                    Configuration.IF_IN_OCTETS + "." + entry.getKey(),
+                    Configuration.IF_IN_UCAST_PKTS + "." + entry.getKey(),
+                    Configuration.IF_IN_NUCAST_PKTS + "." + entry.getKey(),
+                    Configuration.IF_OUT_OCTETS + "." + entry.getKey(),
+                    Configuration.IF_OUT_UCAST_PKTS + "." + entry.getKey(),
+                    Configuration.IF_OUT_NUCAST_PKTS + "." + entry.getKey()
+            )
+            );
             List<Metric> inOctValues = snmpCollector.collectSingleOID(Collections.singletonList(entry.getValue()));
             hostTraffic.put(entry.getValue(), inOctValues);
 

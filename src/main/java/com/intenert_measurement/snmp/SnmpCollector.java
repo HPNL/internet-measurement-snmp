@@ -38,7 +38,7 @@ public class SnmpCollector {
             log.info("Collector metrics from hosts: {}\n", new Date());
             for (HostSnmpConnectionInfo host : hosts) {
                 Map<String, Object> result = CollectorUtil.collect(host, oids, isTable);
-                hostCollectedMetrics.addAll(result.values().stream().map(number -> new Metric(number, null, new Date(), host)).collect(Collectors.toList()));
+                hostCollectedMetrics.addAll(result.entrySet().stream().map(x -> new Metric(x.getKey(), x.getValue(), null, new Date(), host)).collect(Collectors.toList()));
             }
             Thread.sleep(TimeUnit.SECONDS.toMillis(1)); // wait to do next collection
             currentTime = System.currentTimeMillis();
