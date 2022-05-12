@@ -21,7 +21,7 @@ public class FailureMetricCollector {
         hosts.add(new HostSnmpConnectionInfo("vm2", "127.0.0.1", 1162, 100, "public"));
 
         SnmpCollector snmpCollector = new SnmpCollector(Collections.singletonList(Configuration.Sys_UPTIME_OID));
-        List<Metric> metrics = snmpCollector.collect(hosts);
+        List<Metric> metrics = snmpCollector.collectSingleOID(hosts);
         metrics.stream().peek(x -> x.setType(MetricType.UPTIME));
 
         log.info("--------------------------------- Draw Charts --------------------------------------------");

@@ -2,13 +2,13 @@ package com.intenert_measurement.snmp;
 
 import com.intenert_measurement.snmp.util.HostSnmpConnectionInfo;
 import lombok.extern.slf4j.Slf4j;
-import org.snmp4j.CommunityTarget;
-import org.snmp4j.PDU;
-import org.snmp4j.Snmp;
-import org.snmp4j.TransportMapping;
+import org.snmp4j.*;
 import org.snmp4j.event.ResponseEvent;
 import org.snmp4j.smi.*;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
+import org.snmp4j.util.DefaultPDUFactory;
+import org.snmp4j.util.TableEvent;
+import org.snmp4j.util.TableUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CollectorUtil {
 
-    public static Map<String, Number> collect(HostSnmpConnectionInfo host, List<String> oids) {
+    public static Map<String, Object> collect(HostSnmpConnectionInfo host, List<String> oids, boolean isTable) {
         try {
             // Create TransportMapping and Listen
             TransportMapping transport = new DefaultUdpTransportMapping();
@@ -40,6 +40,10 @@ public class CollectorUtil {
             // Create Snmp object for sending data to Agent
             try (Snmp snmp = new Snmp(transport)) {
                 log.info("Sending Request to Host {}", host.getAddress());
+
+                if (isTable) {
+                    return getTableAsStrings(snmp, target, oids);
+                }
                 ResponseEvent response = snmp.get(pdu, target);
                 // Process Agent Response
                 if (response != null) {
@@ -65,18 +69,18 @@ public class CollectorUtil {
                 }
             }
         } catch (Exception e) {
-            log.error("Could not collect snmp from host {}", host.getAddress());
+            log.error("Could not collectSingleOID snmp from host {}", host.getAddress());
         }
         return new HashMap<>();
     }
 
-    private static Map<String, Number> readMetric(HostSnmpConnectionInfo host, PDU responsePDU) {
-        Map<String, Number> result = new HashMap<>();
+    private static Map<String, Object> readMetric(HostSnmpConnectionInfo host, PDU responsePDU) {
+        Map<String, Object> result = new HashMap<>();
         try {
             List<? extends VariableBinding> variableBindings = responsePDU.getVariableBindings();
             for (VariableBinding variableBinding : variableBindings) {
                 try {
-                    result.put(variableBinding.getOid().toDottedString(), castToNumber(variableBinding.getVariable().clone()));
+                    result.put(variableBinding.getOid().toDottedString(), variableBinding.getVariable().clone());
                 } catch (Exception ignore) {
                 }
             }
@@ -84,6 +88,25 @@ public class CollectorUtil {
             log.error("Could not read SNMP response from host {}", host.getAddress());
         }
         return result;
+    }
+
+    private static Map<String, Object> getTableAsStrings(Snmp snmp, Target target, List<String> oids) {
+        TableUtils tUtils = new TableUtils(snmp, new DefaultPDUFactory());
+        OID[] oidObj = oids.stream().map(OID::new).collect(Collectors.toList()).toArray(new OID[0]);
+        List<TableEvent> events = tUtils.getTable(target, oidObj, null, null);
+
+        Map<String, Object> list = new HashMap<>();
+        for (TableEvent event : events) {
+            if (event.isError()) {
+                throw new RuntimeException(event.getErrorMessage());
+            }
+            for (VariableBinding vb : event.getColumns()) {
+                if (vb != null) {
+                    list.put(vb.getOid().toDottedString(), vb.getVariable());
+                }
+            }
+        }
+        return list;
     }
 
     private static Number castToNumber(Object value) {

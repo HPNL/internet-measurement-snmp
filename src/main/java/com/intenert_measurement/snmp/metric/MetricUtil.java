@@ -27,7 +27,7 @@ public class MetricUtil {
         return aggregatedValues;
     }
 
-    public static List<Metric> computeMetricStaticTypes(List<Metric> rawValues, Function<Metric, Number> valueFunc, MetricType type) {
+    public static List<Metric> computeMetricStaticTypes(List<Metric> rawValues, Function<Metric, Object> valueFunc, MetricType type) {
         List<Metric> aggregatedValues = new ArrayList<>();
         for (int i = 0; i < rawValues.size(); i++) {
             Metric clonePoint = rawValues.get(i).clone();
@@ -70,13 +70,13 @@ public class MetricUtil {
         return aggregatedValues;
     }
 
-    private static Pair<Integer, Integer> findMTBFPeriod(List<Metric> values, int startPoint, Function<Metric, Number> valueFunc) {
+    private static Pair<Integer, Integer> findMTBFPeriod(List<Metric> values, int startPoint, Function<Metric, Object> valueFunc) {
         boolean findNull = false;
         boolean findNotNull = false;
         Integer firsNullIndex = null;
         Integer secondNullIndex = null;
         for (int i = startPoint; i < values.size(); i++) {
-            Number value = valueFunc.apply(values.get(i));
+            Object value = valueFunc.apply(values.get(i));
             if (!findNull && value == null) {
                 findNull = true;
                 firsNullIndex = i;
@@ -93,12 +93,12 @@ public class MetricUtil {
         return Pair.of(firsNullIndex, secondNullIndex);
     }
 
-    private static Pair<Integer, Integer> findMTTFPeriod(List<Metric> values, int startPoint, Function<Metric, Number> valueFunc) {
+    private static Pair<Integer, Integer> findMTTFPeriod(List<Metric> values, int startPoint, Function<Metric, Object> valueFunc) {
         boolean findNotNull = false;
         Integer startNotNullIndex = null;
         Integer endNotNullIndex = null;
         for (int i = startPoint; i < values.size(); i++) {
-            Number value = valueFunc.apply(values.get(i));
+            Object value = valueFunc.apply(values.get(i));
             if (!findNotNull && value != null) {
                 findNotNull = true;
                 startNotNullIndex = i;

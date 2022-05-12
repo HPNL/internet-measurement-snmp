@@ -12,7 +12,7 @@ import java.util.Date;
 @Setter
 public class Metric {
 
-    private Number value;
+    private Object value;
     private MetricType type;
     private Date timestamp;
     private HostSnmpConnectionInfo host;
