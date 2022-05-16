@@ -112,4 +112,4 @@ class CustomTopology(Topo):
         # h4.cmd('ifconfig h4-eth0 10.145.0.1')
 
 
-topos = {'fat_tree_topo': (lambda: CustomTopology())}
+topos = {'custom_topology': (lambda: CustomTopology())}

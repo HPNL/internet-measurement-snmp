@@ -10,12 +10,10 @@ from mininet.link import TCLink
 from mininet.cli import CLI
 from mininet.log import setLogLevel, info
 
-from linear import LinearTopo
-from mesh import MeshTopo
-from fat_tree_topo import FatTreeTopo
+from custom_topology import CustomTopology
 
-from os import path
-from os import mkdir
+import os
+import os
 import random
 import time
 import sys
@@ -43,7 +41,7 @@ n_mice_flows = 10
 mice_flow_min = 100  # KBytes = 100KB
 mice_flow_max = 10240  # KBytes = 10MB
 elephant_flow_min = 10240  # KBytes = 10MB
-elephant_flow_max = 1024 * 1024 * 10  # KBytes = 10 GB
+elephant_flow_max = 1024 * 100  # KBytes = 100 MB
 
 # FLOWS
 # n_mice_flows = 45
@@ -59,12 +57,10 @@ port_max = 65536
 sampling_interval = '1'  # seconds
 
 # ELEPHANT FLOW PARAMS
-elephant_bandwidth_list = ['10M', '20M', '30M', '40M', '50M', '60M', '70M', '80M', '90M', '100M',
-                           '200M', '300M', '400M', '500M', '600M', '700M', '800M', '900M', '1000M']
+elephant_bandwidth_list = ['10M', '20M', '30M', '40M', '50M', '60M', '70M', '80M', '90M', '100M']
 
 # MICE FLOW PARAMS
-mice_bandwidth_list = ['100K', '200K', '300K', '400K', '500K', '600K', '700K', '800K', '900K', '1000K',
-                       '2000K', '3000K', '4000K', '5000K', '6000K', '7000K', '8000K', '9000K', '10000K', '1000K']
+mice_bandwidth_list = ['100K', '200K', '300K', '400K', '500K', '600K', '700K', '800K', '900K', '1000K']
 
 
 def random_normal_number(low, high):
@@ -172,7 +168,7 @@ def generate_flows(n_elephant_flows, n_mice_flows, duration, net, log_dir):
     Generate elephant and mice flows randomly for the given duration
     """
 
-    if not path.exists(log_dir):
+    if not os.path.exists(log_dir):
         mkdir(log_dir)
 
     n_total_flows = n_elephant_flows + n_mice_flows
@@ -248,7 +244,7 @@ def generate_flows(n_elephant_flows, n_mice_flows, duration, net, log_dir):
 # Main function
 if __name__ == "__main__":
     # Loading default parameter values
-    log_dir = "./log/test-"
+    log_dir = "/log/test-"
     topology = CustomTopology()
     default_controller = True
     controller_ip = "127.0.0.1"  # localhost
@@ -261,11 +257,11 @@ if __name__ == "__main__":
     setLogLevel('info')
 
     # creating log directory
-    log_dir = path.expanduser('~') + log_dir
+    log_dir = os.path.abspath(os.getcwd()) + log_dir
     i = 1
     while True:
-        if not path.exists(log_dir + str(i)):
-            # mkdir(log_dir + str(i))
+        if not os.path.exists(log_dir + str(i)):
+            os.makedirs(log_dir + str(i))
             log_dir = log_dir + str(i)
             break
         i = i + 1
