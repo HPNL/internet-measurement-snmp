@@ -1,5 +1,6 @@
 package com.intenert_measurement.snmp;
 
+import com.intenert_measurement.snmp.collector.SnmpCollector;
 import com.intenert_measurement.snmp.metric.Metric;
 import com.intenert_measurement.snmp.util.HostSnmpConnectionInfo;
 import lombok.extern.slf4j.Slf4j;

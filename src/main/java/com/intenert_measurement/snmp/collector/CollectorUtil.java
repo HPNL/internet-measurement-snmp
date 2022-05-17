@@ -1,5 +1,6 @@
-package com.intenert_measurement.snmp;
+package com.intenert_measurement.snmp.collector;
 
+import com.intenert_measurement.snmp.Configuration;
 import com.intenert_measurement.snmp.util.HostSnmpConnectionInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.snmp4j.*;
