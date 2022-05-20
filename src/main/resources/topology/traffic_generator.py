@@ -68,7 +68,11 @@ def random_normal_number(low, high):
     mean = int(float(range) * float(75) / float(100)) + low
     sd = int(float(range) / float(4))
     num = np.random.normal(mean, sd)
+
     return int(num)
+
+def poison_number(lambda_val, size_val):
+    return random.poisson(lam=lambda_val, size=size_val)
 
 
 def generate_elephant_flows(id, duration, net, log_dir):
