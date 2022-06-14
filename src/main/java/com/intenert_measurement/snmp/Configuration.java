@@ -15,6 +15,7 @@ public class Configuration {
     public static final long COLLECTOR_PERIOD = TimeUnit.SECONDS.toMillis(10);
 
     public static final String IF_INDEX = "1.3.6.1.2.1.2.2.1.1";
+    public static final String IF_NAME = "1.3.6.1.2.1.2.2.1.2";
     public static final String IFX_TABLE_INDEX = "1.3.6.1.2.1.31.1.1.1.1";
     public static final String IP_ADDR_TABLE_IP = "1.3.6.1.2.1.4.20.1.1";
     public static final String IP_ADDR_TABLE_INDEX = "1.3.6.1.2.1.4.20.1.2";

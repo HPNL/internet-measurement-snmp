@@ -4,11 +4,14 @@ import com.intenert_measurement.snmp.chart.ChartUtil;
 import com.intenert_measurement.snmp.collector.SnmpCollector;
 import com.intenert_measurement.snmp.metric.Metric;
 import com.intenert_measurement.snmp.metric.MetricType;
+import com.intenert_measurement.snmp.metric.MetricUtil;
 import com.intenert_measurement.snmp.util.HostSnmpConnectionInfo;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class FailureMetricCollector {
@@ -27,5 +30,26 @@ public class FailureMetricCollector {
 
         log.info("--------------------------------- Draw Charts --------------------------------------------");
         ChartUtil.saveAndShowResults(metrics, true);
+    }
+
+    private void addFailreMetrics(List<Metric> metrics) {
+        // compute statistical metrics
+        Map<HostSnmpConnectionInfo, List<Metric>> hostTotalMetricsChart = metrics.stream().collect(Collectors.groupingBy(Metric::getHost));
+        // type different chart for hosts
+
+        for (Map.Entry<HostSnmpConnectionInfo, List<Metric>> metricsEntry : hostTotalMetricsChart.entrySet()) {
+            metrics.addAll(MetricUtil.computeMetricStaticTypes(
+                    metricsEntry.getValue(),
+                    (Metric::getValue),
+                    MetricType.MTBF
+                    )
+            );
+            metrics.addAll(MetricUtil.computeMetricStaticTypes(
+                    metricsEntry.getValue(),
+                    (Metric::getValue),
+                    MetricType.MTTF
+                    )
+            );
+        }
     }
 }

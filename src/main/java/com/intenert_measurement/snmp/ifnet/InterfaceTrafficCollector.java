@@ -13,6 +13,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.snmp4j.smi.Integer32;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -38,7 +39,7 @@ public class InterfaceTrafficCollector {
 
         // collect host traffic
         InterfaceTrafficCollector trafficCollector = new InterfaceTrafficCollector();
-        Map<HostSnmpConnectionInfo, List<InterfaceMetrics>> ifTraffics = trafficCollector.collectHostAllInterface(hosts);
+        Map<HostSnmpConnectionInfo, List<InterfaceMetrics>> ifTraffics = trafficCollector.collectHostAllInterface(hosts, (x) -> x != null && x.toLowerCase().startsWith("switch"));
 
         for (Map.Entry<HostSnmpConnectionInfo, List<InterfaceMetrics>> entry : ifTraffics.entrySet()) {
             for (InterfaceMetrics interfaceMetrics : entry.getValue()) {
@@ -88,40 +89,42 @@ public class InterfaceTrafficCollector {
         return hostTraffic;
     }
 
-    private Map<HostSnmpConnectionInfo, List<InterfaceMetrics>> collectHostAllInterface(List<HostSnmpConnectionInfo> hosts) throws Exception {
+    private Map<HostSnmpConnectionInfo, List<InterfaceMetrics>> collectHostAllInterface(
+            List<HostSnmpConnectionInfo> hosts,
+            Function<String, Boolean> interfaceNameFilter
+    ) throws Exception {
         Map<Integer, HostSnmpConnectionInfo> hostIndices = new HashMap<>();
         Map<HostSnmpConnectionInfo, List<InterfaceMetrics>> hostTraffic = new HashMap<>();
 
         SnmpCollector snmpCollector = SnmpCollector.ofTable(
                 new HashMap<String, MetricType>() {
                     {
-                        put(Configuration.IP_ADDR_TABLE_IP, MetricType.IF_IP);
-                        put(Configuration.IP_ADDR_TABLE_INDEX, MetricType.IF_INDEX);
+                        put(Configuration.IF_NAME, MetricType.IF_NAME);
+                        put(Configuration.IF_INDEX, MetricType.IF_INDEX);
                     }
                 }
         );
         // find host if index
         for (HostSnmpConnectionInfo host : hosts) {
             Map<String, Object> metrics = snmpCollector.collectTable(Collections.singletonList(host));
-            //            Map<String, String> ipList = metrics.entrySet().stream().filter(x -> x.getValue() instanceof IpAddress).collect(Collectors.toMap(
-            //                    Map.Entry::getKey,
-            //                    y -> y.getValue().toString()
-            //            ));
-            Map<String, String> indexList = metrics.entrySet().stream().filter(x -> x.getValue() instanceof Integer32).collect(Collectors.toMap(
-                    Map.Entry::getKey,
-                    y -> y.getValue().toString()
-            ));
+            Map<String, String> indexList = new HashMap<>();
+            for (String index : metrics.keySet().stream().filter(x -> x.startsWith(Configuration.IF_INDEX)).collect(Collectors.toSet())) {
+                String ifName = String.valueOf(metrics.get(Configuration.IF_NAME + "." + metrics.get(index)));
+                if (interfaceNameFilter.apply(ifName)) {
+                    indexList.put(ifName, String.valueOf(metrics.get(index)));
+                }
+            }
             hostIndices.put(null, host);
 
             List<InterfaceMetrics> interfaceMetrics = new ArrayList<>();
             for (Map.Entry<String, String> entry : indexList.entrySet()) {
-                String ip = entry.getKey().replace(Configuration.IP_ADDR_TABLE_INDEX + ".", "");
+                String ifName = entry.getKey();
                 String index = entry.getValue();
                 // read if table values
                 snmpCollector = new SnmpCollector(new HashMap<String, MetricType>() {
                     {
-                        put(Configuration.IF_IN_OCTETS + "." + entry.getKey(), MetricType.IF_IN_TRAFFIC);
-                        put(Configuration.IF_OUT_OCTETS + "." + entry.getKey(), MetricType.IF_OUT_TRAFFIC);
+                        put(Configuration.IF_IN_OCTETS + "." + index, MetricType.IF_IN_TRAFFIC);
+                        put(Configuration.IF_OUT_OCTETS + "." + index, MetricType.IF_OUT_TRAFFIC);
                         //put(Configuration.IF_IN_UCAST_PKTS + "." + entry.getKey(), MetricType.IF);
                         //put(Configuration.IF_IN_NUCAST_PKTS + "." + entry.getKey(), MetricType.IF);
                         //put(Configuration.IF_OUT_UCAST_PKTS + "." + entry.getKey(), MetricType.IF);
@@ -129,7 +132,7 @@ public class InterfaceTrafficCollector {
                     }
                 }
                 );
-                interfaceMetrics.add(new InterfaceMetrics(ip, index, snmpCollector.collectSingleOID(Collections.singletonList(host))));
+                interfaceMetrics.add(new InterfaceMetrics(ifName, index, snmpCollector.collectSingleOID(Collections.singletonList(host))));
             }
             hostTraffic.put(host, interfaceMetrics);
         }

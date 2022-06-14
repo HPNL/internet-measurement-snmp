@@ -25,24 +25,6 @@ public class ChartUtil {
         }
         List<ChartTotalInfo> chartTotalInfos = new ArrayList<>();
 
-        // compute statistical metrics
-        Map<HostSnmpConnectionInfo, List<Metric>> hostTotalMetricsChart = metrics.stream().collect(Collectors.groupingBy(Metric::getHost));
-        // type different chart for hosts
-        for (Map.Entry<HostSnmpConnectionInfo, List<Metric>> metricsEntry : hostTotalMetricsChart.entrySet()) {
-            metrics.addAll(MetricUtil.computeMetricStaticTypes(
-                    metricsEntry.getValue(),
-                    (Metric::getValue),
-                    MetricType.MTBF
-                    )
-            );
-            metrics.addAll(MetricUtil.computeMetricStaticTypes(
-                    metricsEntry.getValue(),
-                    (Metric::getValue),
-                    MetricType.MTTF
-                    )
-            );
-        }
-
         Map<MetricType, List<Metric>> groupByType = metrics.stream().collect(Collectors.groupingBy(Metric::getType));
         for (Map.Entry<MetricType, List<Metric>> typeGroup : groupByType.entrySet()) {
             Map<String, ChartSeriesInfo> hostToRawValues = new HashMap<>();

@@ -8,6 +8,7 @@ public enum MetricType {
     IF_OUT_TRAFFIC,
     IF_IP,
     IF_INDEX,
+    IF_NAME,
     MTBF,
     MTTF;
 
