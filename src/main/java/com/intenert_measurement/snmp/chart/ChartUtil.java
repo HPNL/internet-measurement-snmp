@@ -51,14 +51,15 @@ public class ChartUtil {
             for (Map.Entry<HostSnmpConnectionInfo, List<Metric>> metricsEntry : hostChart.entrySet()) {
                 hostToRawValues.put(metricsEntry.getKey().getName() + "-" + typeGroup.getKey().name() + "-Raw", new ChartSeriesInfo(
                                 metricsEntry.getValue().stream().map(Metric::getTimestamp).collect(Collectors.toList()),
-                                metricsEntry.getValue().stream().map(x -> x.getType() == MetricType.UPTIME ? x.getAvailability() : (Number) x.getValue()).collect(Collectors.toList())
+                                metricsEntry.getValue().stream().map(x -> x.getType() == MetricType.UPTIME ?
+                                        x.getAvailability() : x.toNumber()).collect(Collectors.toList())
                         )
                 );
                 hostToRawValues.put(metricsEntry.getKey().getName() + "-" + typeGroup.getKey().name() + "-Avg", new ChartSeriesInfo(
                                 metricsEntry.getValue().stream().map(Metric::getTimestamp).collect(Collectors.toList()),
                                 MetricUtil.computeAggregation(
                                         metricsEntry.getValue(),
-                                        (x -> x.getType() == MetricType.UPTIME ? x.getAvailability() : (Number) x.getValue()),
+                                        (x -> x.getType() == MetricType.UPTIME ? x.getAvailability() : (Number) x.toNumber()),
                                         Aggregator.AVERAGE
                                 ).stream().map(x -> (Number) x.getValue()).collect(Collectors.toList())
                         )

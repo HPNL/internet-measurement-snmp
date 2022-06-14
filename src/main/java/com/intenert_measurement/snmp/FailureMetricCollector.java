@@ -7,21 +7,21 @@ import com.intenert_measurement.snmp.metric.MetricType;
 import com.intenert_measurement.snmp.util.HostSnmpConnectionInfo;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 @Slf4j
 public class FailureMetricCollector {
 
-    public static void main(String[] args) throws Exception {
+    public static void test(List<HostSnmpConnectionInfo> hosts) throws Exception {
 
-        List<HostSnmpConnectionInfo> hosts = new ArrayList<>();
+        // for example
+        //        hosts.add(new HostSnmpConnectionInfo("vm1", "127.0.0.1", 161, 100, "public"));
+        //        hosts.add(new HostSnmpConnectionInfo("vm2", "127.0.0.1", 1162, 100, "public"));
 
-        hosts.add(new HostSnmpConnectionInfo("vm1", "127.0.0.1", 161, 100, "public"));
-        hosts.add(new HostSnmpConnectionInfo("vm2", "127.0.0.1", 1162, 100, "public"));
-
-        SnmpCollector snmpCollector = new SnmpCollector(Collections.singletonList(Configuration.Sys_UPTIME_OID));
+        SnmpCollector snmpCollector = new SnmpCollector(new HashMap<String, MetricType>() {{
+            put(Configuration.Sys_UPTIME_OID, MetricType.UPTIME);
+        }});
         List<Metric> metrics = snmpCollector.collectSingleOID(hosts);
         metrics.stream().peek(x -> x.setType(MetricType.UPTIME));
 

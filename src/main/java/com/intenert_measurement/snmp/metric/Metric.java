@@ -4,6 +4,7 @@ import com.intenert_measurement.snmp.util.HostSnmpConnectionInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.Date;
 
@@ -32,6 +33,14 @@ public class Metric {
 
     public Metric clone() {
         return new Metric(this.oid, this.value, this.type, this.timestamp, this.host);
+    }
+
+    public Number toNumber() {
+        try {
+            return NumberUtils.toDouble(String.valueOf(value));
+        } catch (Exception ignore) {
+        }
+        return null;
     }
 }
 

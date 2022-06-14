@@ -2,6 +2,7 @@ package com.intenert_measurement.snmp.collector;
 
 import com.intenert_measurement.snmp.Configuration;
 import com.intenert_measurement.snmp.metric.Metric;
+import com.intenert_measurement.snmp.metric.MetricType;
 import com.intenert_measurement.snmp.util.HostSnmpConnectionInfo;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -15,15 +16,15 @@ import java.util.stream.Collectors;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class SnmpCollector {
 
-    private final List<String> oids;
+    private final Map<String, MetricType> oids;
     private final boolean isTable;
 
-    public SnmpCollector(List<String> oids) {
+    public SnmpCollector(Map<String, MetricType> oids) {
         this.oids = oids;
         this.isTable = false;
     }
 
-    public static SnmpCollector ofTable(List<String> oids) {
+    public static SnmpCollector ofTable(Map<String, MetricType> oids) {
         return new SnmpCollector(oids, true);
     }
 
@@ -38,8 +39,14 @@ public class SnmpCollector {
             log.info("-----------------------------------------------------------------------------");
             log.info("Collector metrics from hosts: {}\n", new Date());
             for (HostSnmpConnectionInfo host : hosts) {
-                Map<String, Object> result = CollectorUtil.collect(host, oids, isTable);
-                hostCollectedMetrics.addAll(result.entrySet().stream().map(x -> new Metric(x.getKey(), x.getValue(), null, new Date(), host)).collect(Collectors.toList()));
+                Map<String, Object> result = CollectorUtil.collect(host, new ArrayList<>(oids.keySet()), isTable);
+                hostCollectedMetrics.addAll(result.entrySet().stream().map(x -> new Metric(
+                        x.getKey(),
+                        x.getValue(),
+                        oids.get(x.getKey()),
+                        new Date(),
+                        host
+                )).collect(Collectors.toList()));
             }
             Thread.sleep(TimeUnit.SECONDS.toMillis(1)); // wait to do next collection
             currentTime = System.currentTimeMillis();
@@ -62,7 +69,7 @@ public class SnmpCollector {
             log.info("-----------------------------------------------------------------------------");
             log.info("Collector metrics from hosts: {}\n", new Date());
             for (HostSnmpConnectionInfo host : hosts) {
-                result.putAll(CollectorUtil.collect(host, oids, isTable));
+                result.putAll(CollectorUtil.collect(host, new ArrayList<>(oids.keySet()), isTable));
             }
             Thread.sleep(TimeUnit.SECONDS.toMillis(1)); // wait to do next collection
             currentTime = System.currentTimeMillis();
