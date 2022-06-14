@@ -1,5 +1,6 @@
 package com.intenert_measurement.snmp.chart;
 
+import com.intenert_measurement.snmp.ifnet.InterfaceMetrics;
 import com.intenert_measurement.snmp.metric.Aggregator;
 import com.intenert_measurement.snmp.metric.Metric;
 import com.intenert_measurement.snmp.metric.MetricType;
@@ -18,6 +19,13 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
 public class ChartUtil {
+
+    public static void saveAndShowResults(InterfaceMetrics interfaceMetrics, boolean saveResult) {
+        for (Metric metric : interfaceMetrics.getMetrics()) {
+            metric.getHost().setName(interfaceMetrics.getIp()); // only for show in chart
+        }
+        saveAndShowResults(interfaceMetrics.getMetrics(), saveResult);
+    }
 
     public static void saveAndShowResults(List<Metric> metrics, boolean saveResult) {
         if (metrics.isEmpty()) {

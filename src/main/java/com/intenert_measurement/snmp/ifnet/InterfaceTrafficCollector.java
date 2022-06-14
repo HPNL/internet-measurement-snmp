@@ -43,7 +43,7 @@ public class InterfaceTrafficCollector {
 
         for (Map.Entry<HostSnmpConnectionInfo, List<InterfaceMetrics>> entry : ifTraffics.entrySet()) {
             for (InterfaceMetrics interfaceMetrics : entry.getValue()) {
-                ChartUtil.saveAndShowResults(interfaceMetrics.getMetrics(), true);
+                ChartUtil.saveAndShowResults(interfaceMetrics, true);
             }
         }
         System.out.println("Finish collector");
