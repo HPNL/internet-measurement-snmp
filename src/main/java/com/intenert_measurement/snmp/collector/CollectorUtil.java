@@ -93,7 +93,7 @@ public class CollectorUtil {
 
     private static Map<String, Object> getTableAsStrings(Snmp snmp, Target target, List<String> oids) {
         TableUtils tUtils = new TableUtils(snmp, new DefaultPDUFactory());
-        OID[] oidObj = oids.stream().map(OID::new).collect(Collectors.toList()).toArray(new OID[0]);
+        OID[] oidObj = oids.stream().map(OID::new).toArray(OID[]::new);
         List<TableEvent> events = tUtils.getTable(target, oidObj, null, null);
 
         Map<String, Object> list = new HashMap<>();

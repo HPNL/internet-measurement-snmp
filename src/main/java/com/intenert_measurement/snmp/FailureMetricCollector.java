@@ -32,22 +32,22 @@ public class FailureMetricCollector {
         ChartUtil.saveAndShowResults(metrics, true);
     }
 
-    private void addFailreMetrics(List<Metric> metrics) {
+    private void addFailureMetrics(List<Metric> metrics) {
         // compute statistical metrics
         Map<HostSnmpConnectionInfo, List<Metric>> hostTotalMetricsChart = metrics.stream().collect(Collectors.groupingBy(Metric::getHost));
         // type different chart for hosts
 
         for (Map.Entry<HostSnmpConnectionInfo, List<Metric>> metricsEntry : hostTotalMetricsChart.entrySet()) {
             metrics.addAll(MetricUtil.computeMetricStaticTypes(
-                    metricsEntry.getValue(),
-                    (Metric::getValue),
-                    MetricType.MTBF
+                            metricsEntry.getValue(),
+                            (Metric::getValue),
+                            MetricType.MTBF
                     )
             );
             metrics.addAll(MetricUtil.computeMetricStaticTypes(
-                    metricsEntry.getValue(),
-                    (Metric::getValue),
-                    MetricType.MTTF
+                            metricsEntry.getValue(),
+                            (Metric::getValue),
+                            MetricType.MTTF
                     )
             );
         }
